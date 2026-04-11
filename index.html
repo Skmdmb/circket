@@ -18,9 +18,9 @@
                 <button onclick="generateTeamInputs()" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-black">NEXT</button>
             </div>
             <div id="setupStep2" class="space-y-4 hidden">
-                <div id="teamNamesContainer" class="space-y-2 max-h-48 overflow-y-auto"></div>
+                <div id="teamNamesContainer" class="space-y-2 max-h-48 overflow-y-auto no-scrollbar"></div>
                 <input id="setupOvers" type="number" value="5" class="w-full bg-slate-900 p-4 rounded-2xl text-center text-xl font-bold border border-slate-700 outline-none text-yellow-500">
-                <button onclick="saveTournamentConfig()" class="w-full bg-yellow-500 text-black p-4 rounded-2xl font-black uppercase">Save & Sync</button>
+                <button onclick="saveTournamentConfig()" class="w-full bg-yellow-500 text-black p-4 rounded-2xl font-black uppercase tracking-widest">Start Season</button>
             </div>
         </div>
     </div>
@@ -29,9 +29,9 @@
         <div class="bg-slate-800 p-8 rounded-[3rem] w-full max-w-sm border border-slate-700">
             <h2 class="text-xl font-black text-blue-400 mb-6 italic uppercase">Set Match</h2>
             <div class="space-y-4">
-                <select id="selectBatTeam" class="w-full bg-slate-900 p-4 rounded-2xl outline-none border border-slate-700"></select>
+                <select id="selectBatTeam" class="w-full bg-slate-900 p-4 rounded-2xl font-bold outline-none border border-slate-700"></select>
                 <p class="text-[10px] font-black text-slate-600">VERSUS</p>
-                <select id="selectBowlTeam" class="w-full bg-slate-900 p-4 rounded-2xl outline-none border border-slate-700"></select>
+                <select id="selectBowlTeam" class="w-full bg-slate-900 p-4 rounded-2xl font-bold outline-none border border-slate-700"></select>
                 <button onclick="startSpecificMatch()" class="w-full bg-green-600 text-white p-4 rounded-2xl font-black uppercase">Start Match</button>
             </div>
         </div>
@@ -40,14 +40,14 @@
     <nav class="p-4 flex justify-between items-center bg-slate-800 border-b border-slate-700 sticky top-0 z-50">
         <h1 class="font-black italic text-yellow-500 tracking-tighter">SUNDAY LIVE</h1>
         <div class="flex gap-2">
-            <button onclick="togglePoints()" class="text-[10px] bg-blue-600 px-3 py-2 rounded-full font-bold uppercase">🏆 Table</button>
-            <button id="adminBtn" onclick="toggleAdmin()" class="text-[10px] bg-slate-700 px-3 py-2 rounded-full font-bold uppercase">🔐 Admin</button>
+            <button onclick="togglePoints()" class="text-[10px] bg-blue-600 px-3 py-2 rounded-full font-bold uppercase tracking-widest">🏆 Table</button>
+            <button id="adminBtn" onclick="toggleAdmin()" class="text-[10px] bg-slate-700 px-3 py-2 rounded-full font-bold uppercase tracking-widest">🔐 Admin</button>
         </div>
     </nav>
 
     <div id="waitingState" class="flex flex-col items-center justify-center p-12 text-center mt-20">
         <div class="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mb-4 animate-bounce text-2xl">🏏</div>
-        <h2 class="text-xl font-black text-slate-500 uppercase italic tracking-widest">No Active Match</h2>
+        <h2 class="text-xl font-black text-slate-500 uppercase italic">No Active Match</h2>
     </div>
 
     <div id="mainDashboard" class="max-w-md mx-auto p-4 hidden">
@@ -93,7 +93,7 @@
                 <button onclick="handleRun(3)" class="bg-slate-800 h-12 rounded-xl font-bold">3</button>
                 <button onclick="handleRun(4)" class="bg-blue-600 h-12 rounded-xl font-black">4</button>
                 <button onclick="handleRun(6)" class="bg-green-600 h-12 rounded-xl font-black">6</button>
-                <button onclick="handleWicket()" class="bg-red-600 h-12 rounded-xl font-black text-[10px]">WKT</button>
+                <button onclick="handleWicket()" class="bg-red-600 h-12 rounded-xl font-black text-[10px]">OUT</button>
                 <button onclick="undo()" class="bg-slate-700 h-12 rounded-xl text-[10px] font-bold uppercase">Undo</button>
             </div>
             <div class="flex bg-slate-800 p-1 rounded-xl" id="adminTeamTabs">
@@ -101,12 +101,12 @@
                 <button id="adminTab2" onclick="switchAdminTeam(2)" class="flex-1 py-2 rounded-lg text-[9px] font-black uppercase">Bowling</button>
             </div>
             <div class="flex gap-2">
-                <input id="newP" type="text" placeholder="Player Name" class="flex-1 bg-slate-800 p-3 rounded-xl text-xs border border-slate-700 outline-none">
+                <input id="newP" type="text" placeholder="Add Player" class="flex-1 bg-slate-800 p-3 rounded-xl text-xs border border-slate-700 outline-none">
                 <button onclick="addP()" class="bg-yellow-500 text-black px-5 rounded-xl font-black">+</button>
             </div>
             <div id="adminPList" class="space-y-1 max-h-48 overflow-y-auto no-scrollbar"></div>
             <button onclick="resetMatchOnly()" class="w-full bg-slate-800 p-3 rounded-xl text-[9px] font-black text-yellow-500/50 border border-slate-700 uppercase">Change Match</button>
-            <button onclick="fullSystemReset()" class="w-full bg-red-900/20 p-2 rounded-xl text-[8px] font-black text-red-500 uppercase">Clear All Data</button>
+            <button onclick="fullSystemReset()" class="w-full bg-red-900/20 p-2 rounded-xl text-[8px] font-black text-red-500 uppercase">⚠️ Reset All</button>
         </div>
 
         <div id="statsContent"></div>
@@ -114,7 +114,7 @@
 
     <div id="pointsOverlay" class="fixed inset-0 bg-slate-950/95 z-[250] hidden p-6 flex items-center justify-center">
         <div class="w-full max-w-sm">
-            <h2 class="text-2xl font-black text-yellow-500 mb-4 text-center">POINTS TABLE</h2>
+            <h2 class="text-2xl font-black text-yellow-500 mb-4 text-center italic">POINTS TABLE</h2>
             <div class="bg-slate-800 rounded-3xl p-4 border border-slate-700">
                 <table class="w-full text-left text-xs">
                     <tr class="text-slate-500 border-b border-slate-700"><th class="p-3">TEAM</th><th>W</th><th>L</th><th class="p-3 text-right">PTS</th></tr>
@@ -126,7 +126,6 @@
     </div>
 
     <script>
-        // CONFIG & STATE
         const ADMIN_PASS = "college123";
         const BIN_ID = "3bf04df403317e6901ba"; 
         const API_URL = `https://api.npoint.io/${BIN_ID}`;
@@ -144,41 +143,44 @@
 
         // --- CLOUD SYNC ---
         async function syncToCloud() {
-            if(!isAdmin) return; // Only Admin pushes
+            if(!isAdmin) return;
             try {
                 await fetch(API_URL, {
                     method: 'POST',
                     body: JSON.stringify(state),
                     headers: { 'Content-Type': 'application/json' }
                 });
-            } catch (e) { console.error("Cloud Error:", e); }
+            } catch (e) { console.error("Cloud error"); }
         }
 
         async function autoRefresh() {
+            if (isAdmin) return; 
             try {
                 const res = await fetch(API_URL);
                 const data = await res.json();
-                if(data && data.runs !== undefined && !isAdmin) { // Viewers pull
+                // ONLY OVERWRITE IF DATA IS VALID
+                if(data && data.tournamentTeams && data.tournamentTeams.length > 0) {
                     state = data;
                     render();
                 }
             } catch (e) {}
         }
-        setInterval(autoRefresh, 3000); // Check for updates every 3s
+        setInterval(autoRefresh, 3000);
 
         window.onload = async () => {
-            const res = await fetch(API_URL);
-            const data = await res.json();
-            if(data && data.batTeam) {
-                state = data;
-                document.getElementById('waitingState').classList.add('hidden');
-                document.getElementById('mainDashboard').classList.remove('hidden');
-                activeAdminTeam = state.curBat;
-                render();
-            }
+            try {
+                const res = await fetch(API_URL);
+                const data = await res.json();
+                if(data && data.tournamentTeams && data.tournamentTeams.length > 0) {
+                    state = data;
+                    document.getElementById('waitingState').classList.add('hidden');
+                    document.getElementById('mainDashboard').classList.remove('hidden');
+                    render();
+                }
+            } catch(e) {}
         };
 
-        // --- ADMIN & SETUP ---
+        // --- CORE FUNCTIONS ---
         function toggleAdmin() {
             if(!isAdmin) {
                 if(prompt("Admin PIN:") === ADMIN_PASS) {
@@ -235,14 +237,12 @@
             syncToCloud();
         }
 
-        // --- SCORING ---
         function handleRun(r) {
-            if(state.sIdx === null || state.nsIdx === null || state.bIdx === null) return alert("Set Striker/Bowler!");
+            if(state.sIdx === null || state.nsIdx === null || state.bIdx === null) return alert("Set Players!");
             saveUndo();
             state.runs += r; state.balls++;
             state.players[state.sIdx].r += r; state.players[state.sIdx].b++;
             state.players[state.bIdx].rc += r; state.players[state.bIdx].bb++;
-            if(r===4) state.players[state.sIdx].fours++; if(r===6) state.players[state.sIdx].sixes++;
             if(r % 2 !== 0) swap();
             if(state.balls % 6 === 0) { state.isOverWaiting = true; swap(); }
             render();
@@ -265,6 +265,8 @@
             document.getElementById('dispOvers').innerText = `${Math.floor(state.balls/6)}.${state.balls%6}`;
             document.getElementById('limitOvers').innerText = state.maxOvers;
             document.getElementById('batTeamDisp').innerText = state.curBat;
+            document.getElementById('mainDashboard').classList.remove('hidden');
+            document.getElementById('waitingState').classList.add('hidden');
             
             const lock = state.balls > 0 && state.balls % 6 === 0 && state.isOverWaiting;
             document.getElementById('btnGrid').style.opacity = lock ? "0.3" : "1";
@@ -277,7 +279,7 @@
 
             updateHUD('dispSName', 'dispSStats', state.sIdx);
             updateHUD('dispNSName', 'dispNSStats', state.nsIdx);
-            if(state.bIdx !== null) {
+            if(state.bIdx !== null && state.players[state.bIdx]) {
                 const b = state.players[state.bIdx];
                 document.getElementById('dispBName').innerText = b.name;
                 document.getElementById('dispBStats').innerText = `${b.rc}-${b.w} (${Math.floor(b.bb/6)}.${b.bb%6})`;
@@ -292,7 +294,6 @@
             if(state.matchEnded) return;
             const oversDone = state.balls >= (state.maxOvers * 6);
             const allOut = state.wickers >= 10 || state.players.filter(p => p.team === state.curBat && !p.isOut).length < 1;
-
             if(state.curInn === 2) {
                 if(state.runs >= state.target) finish(state.curBat, state.curBat === state.batTeam ? state.bowlTeam : state.batTeam);
                 else if(oversDone || allOut) finish(state.curBat === state.batTeam ? state.bowlTeam : state.batTeam, state.curBat);
@@ -300,9 +301,8 @@
                 state.target = state.runs + 1; state.curInn = 2; state.curBat = state.bowlTeam;
                 state.runs = 0; state.wickers = 0; state.balls = 0;
                 state.sIdx = state.nsIdx = state.bIdx = null; state.isOverWaiting = false;
-                alert(`Innings Break! Target: ${state.target}`);
-                render();
-                syncToCloud();
+                alert(`Target: ${state.target}`);
+                render(); syncToCloud();
             }
         }
 
@@ -311,12 +311,10 @@
             render(); syncToCloud(); alert(`Winner: ${w}`); togglePoints();
         }
 
-        // --- UI HELPERS ---
-        function switchAdminTeam(side) { activeAdminTeam = (side === 1) ? state.batTeam : state.bowlTeam; renderAdminList(); }
         function addP() {
             const n = document.getElementById('newP').value;
             if(!n) return;
-            state.players.push({name:n, team:activeAdminTeam, r:0, b:0, fours:0, sixes:0, w:0, rc:0, bb:0, isOut:false});
+            state.players.push({name:n, team:activeAdminTeam, r:0, b:0, w:0, rc:0, bb:0, isOut:false});
             document.getElementById('newP').value = '';
             render(); syncToCloud();
         }
@@ -324,10 +322,7 @@
         function renderAdminList() {
             const list = document.getElementById('adminPList');
             const t1Btn = document.getElementById('adminTab1'), t2Btn = document.getElementById('adminTab2');
-            t1Btn.innerText = state.batTeam || 'Batting'; 
-            t2Btn.innerText = state.bowlTeam || 'Bowling';
-            t1Btn.className = `flex-1 py-2 rounded-lg text-[9px] font-black ${activeAdminTeam === state.batTeam ? 'bg-yellow-500 text-black' : 'text-slate-500'}`;
-            t2Btn.className = `flex-1 py-2 rounded-lg text-[9px] font-black ${activeAdminTeam === state.bowlTeam ? 'bg-yellow-500 text-black' : 'text-slate-500'}`;
+            t1Btn.innerText = state.batTeam || 'Team A'; t2Btn.innerText = state.bowlTeam || 'Team B';
             list.innerHTML = '';
             state.players.filter(p => p.team === activeAdminTeam).forEach((p) => {
                 const i = state.players.indexOf(p);
@@ -345,22 +340,19 @@
 
         function renderStats() {
             const cont = document.getElementById('statsContent');
-            const teams = [state.batTeam, state.bowlTeam].filter(t => t !== '');
-            cont.innerHTML = teams.map(t => {
+            cont.innerHTML = [state.batTeam, state.bowlTeam].filter(t => t!=='').map(t => {
                 const pList = state.players.filter(p => p.team === t);
-                return `<div class="mb-4 bg-slate-800 p-5 rounded-3xl border border-slate-700 shadow-xl">
-                    <p class="text-[10px] font-black text-yellow-500 uppercase mb-3">${t} Scorecard</p>
+                return `<div class="mb-4 bg-slate-800 p-5 rounded-3xl border border-slate-700">
+                    <p class="text-[10px] font-black text-yellow-500 uppercase mb-3">${t} Card</p>
                     <table class="w-full text-[10px] text-left">
-                        <tr class="text-slate-500 uppercase border-b border-slate-700/50"><th>Batter</th><th>R(B)</th><th>4/6</th><th>W-R</th></tr>
-                        ${pList.map(p => `<tr class="border-b border-slate-700/20">
-                            <td class="py-2 font-bold ${p.isOut?'line-through opacity-30':''}">${p.name}</td>
-                            <td>${p.r}(${p.b})</td><td>${p.fours}/${p.sixes}</td><td>${p.w}-${p.rc}</td>
-                        </tr>`).join('')}
+                        <tr class="text-slate-500 uppercase border-b border-slate-700/50"><th>Batter</th><th>R(B)</th><th>W-R</th></tr>
+                        ${pList.map(p => `<tr class="border-b border-slate-700/20"><td class="py-2 font-bold ${p.isOut?'line-through opacity-30':''}">${p.name}</td><td>${p.r}(${p.b})</td><td>${p.w}-${p.rc}</td></tr>`).join('')}
                     </table>
                 </div>`
             }).join('');
         }
 
+        function switchAdminTeam(side) { activeAdminTeam = (side === 1) ? state.batTeam : state.bowlTeam; renderAdminList(); }
         function setField(i, r) { if(r==='S') state.sIdx=i; if(r==='NS') state.nsIdx=i; if(r==='B'){state.bIdx=i; state.isOverWaiting=false;} render(); syncToCloud(); }
         function swap() { let t = state.sIdx; state.sIdx = state.nsIdx; state.nsIdx = t; }
         function updateHUD(idN, idS, idx) {
@@ -375,7 +367,7 @@
         function saveUndo() { history.push(JSON.stringify(state)); }
         function undo() { if(history.length>0) { state=JSON.parse(history.pop()); render(); syncToCloud(); } }
         function resetMatchOnly() { state.batTeam = ''; state.players=[]; state.runs=0; state.balls=0; state.curInn=1; state.sIdx=state.nsIdx=state.bIdx=null; showMatchSelector(); syncToCloud(); }
-        function fullSystemReset() { if(confirm("Wipe ALL tournament data?")) { state = { maxOvers: 5, runs: 0, wickers: 0, balls: 0, players: [], sIdx: null, nsIdx: null, bIdx: null, batTeam: '', bowlTeam: '', curBat: '', curInn: 1, target: null, isOverWaiting: false, matchEnded: false, tournamentTeams: [], points: {} }; syncToCloud(); location.reload(); } }
+        function fullSystemReset() { if(confirm("Wipe All?")) { state = { maxOvers: 5, runs: 0, wickers: 0, balls: 0, players: [], sIdx: null, nsIdx: null, bIdx: null, batTeam: '', bowlTeam: '', curBat: '', curInn: 1, target: null, isOverWaiting: false, matchEnded: false, tournamentTeams: [], points: {} }; syncToCloud(); location.reload(); } }
     </script>
 </body>
 </html>
