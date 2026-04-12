@@ -3,138 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sunday League Pro</title>
+    <title>Sunday League Live</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .ball-dot { @apply w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-black border border-slate-700 flex-shrink-0; }
+        body { -webkit-tap-highlight-color: transparent; }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen pb-20">
+<body class="bg-slate-900 text-slate-100 min-h-screen pb-20 selection:bg-yellow-500/30">
 
-    <div id="setupOverlay" class="fixed inset-0 bg-slate-950 z-[200] hidden flex items-center justify-center p-6">
-        <div class="bg-slate-900 p-8 rounded-[3rem] border border-slate-800 w-full max-w-sm shadow-2xl text-center">
-            <h1 class="text-2xl font-black text-yellow-500 italic mb-6">TOURNAMENT SETUP</h1>
+    <div id="setupOverlay" class="fixed inset-0 bg-slate-900 z-[200] hidden flex items-center justify-center p-6">
+        <div class="bg-slate-800 p-8 rounded-[3rem] border border-slate-700 w-full max-w-sm shadow-2xl">
+            <h1 class="text-2xl font-black text-yellow-500 italic mb-6 text-center">SEASON SETUP</h1>
             <div id="setupStep1" class="space-y-4">
-                <input id="numTeams" type="number" value="3" class="w-full bg-black p-4 rounded-2xl text-center text-xl font-bold border border-slate-800">
-                <button onclick="generateTeamInputs()" class="w-full bg-blue-600 p-4 rounded-2xl font-black">NEXT</button>
+                <label class="block text-[10px] text-slate-500 font-bold uppercase">Number of Teams</label>
+                <input id="numTeams" type="number" value="3" class="w-full bg-slate-900 p-4 rounded-2xl text-center text-xl font-bold border border-slate-700 outline-none">
+                <button onclick="generateTeamInputs()" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-black">NEXT</button>
             </div>
             <div id="setupStep2" class="space-y-4 hidden">
                 <div id="teamNamesContainer" class="space-y-2 max-h-48 overflow-y-auto no-scrollbar"></div>
-                <input id="setupOvers" type="number" value="5" class="w-full bg-black p-4 rounded-2xl text-center font-bold border border-slate-800">
-                <button onclick="saveTournamentConfig()" class="w-full bg-yellow-500 text-black p-4 rounded-2xl font-black uppercase">Start Season</button>
+                <input id="setupOvers" type="number" value="5" class="w-full bg-slate-900 p-4 rounded-2xl text-center text-xl font-bold border border-slate-700 outline-none text-yellow-500">
+                <button onclick="saveTournamentConfig()" class="w-full bg-yellow-500 text-black p-4 rounded-2xl font-black uppercase">Start Tournament</button>
             </div>
         </div>
     </div>
 
-    <div id="matchSelector" class="fixed inset-0 bg-black/90 z-[180] hidden flex items-center justify-center p-6">
-        <div class="bg-slate-900 p-8 rounded-[3rem] w-full max-w-sm border border-slate-800 text-center">
-            <h2 class="text-xl font-black text-blue-400 mb-6 uppercase">Set Match</h2>
+    <div id="matchSelector" class="fixed inset-0 bg-slate-950/90 z-[180] hidden flex items-center justify-center p-6 text-center">
+        <div class="bg-slate-800 p-8 rounded-[3rem] w-full max-w-sm border border-slate-700">
+            <h2 class="text-xl font-black text-blue-400 mb-6 italic uppercase tracking-widest">Set Match</h2>
             <div class="space-y-4">
-                <select id="selectBatTeam" class="w-full bg-black p-4 rounded-2xl font-bold border border-slate-800"></select>
-                <select id="selectBowlTeam" class="w-full bg-black p-4 rounded-2xl font-bold border border-slate-800"></select>
-                <button onclick="startSpecificMatch()" class="w-full bg-green-600 p-4 rounded-2xl font-black uppercase tracking-widest">Go Live</button>
+                <select id="selectBatTeam" class="w-full bg-slate-900 p-4 rounded-2xl outline-none border border-slate-700 font-bold"></select>
+                <p class="text-[10px] font-black text-slate-600">VS</p>
+                <select id="selectBowlTeam" class="w-full bg-slate-900 p-4 rounded-2xl outline-none border border-slate-700 font-bold"></select>
+                <button onclick="startSpecificMatch()" class="w-full bg-green-600 text-white p-4 rounded-2xl font-black uppercase">Start Match</button>
             </div>
         </div>
     </div>
 
-    <nav class="p-4 flex justify-between items-center bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
-        <h1 class="font-black italic text-yellow-500 tracking-tighter text-xl">SUNDAY LIVE</h1>
+    <nav class="p-4 flex justify-between items-center bg-slate-800 border-b border-slate-700 sticky top-0 z-50">
+        <h1 class="font-black italic text-yellow-500 tracking-tighter">SUNDAY LIVE</h1>
         <div class="flex gap-2">
-            <button onclick="togglePoints()" class="text-[10px] bg-blue-600 px-3 py-2 rounded-full font-bold uppercase">Table</button>
-            <button id="adminBtn" onclick="toggleAdmin()" class="text-[10px] bg-slate-800 px-3 py-2 rounded-full font-bold uppercase">Admin</button>
+            <button onclick="togglePoints()" class="text-[10px] bg-blue-600 px-3 py-2 rounded-full font-bold uppercase tracking-widest">🏆 Table</button>
+            <button id="adminBtn" onclick="toggleAdmin()" class="text-[10px] bg-slate-700 px-3 py-2 rounded-full font-bold uppercase tracking-widest">🔐 Admin</button>
         </div>
     </nav>
 
-    <div id="mainDashboard" class="max-w-md mx-auto p-4">
-        <div id="waitingState" class="flex flex-col items-center justify-center p-12 text-center mt-10">
-            <div class="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mb-4 animate-bounce text-2xl">🏏</div>
-            <h2 class="text-xl font-black text-slate-500 uppercase italic">No Active Match</h2>
-            <p class="text-[10px] text-slate-700 mt-2 uppercase font-bold">Admin: Click Admin to Start</p>
-        </div>
-
-        <div id="liveDashboard" class="hidden">
-            <div class="bg-slate-900 rounded-[2.5rem] p-6 border-b-8 border-yellow-500 mb-4 shadow-2xl">
-                <div class="flex justify-between items-center mb-2">
-                    <h2 id="batTeamDisp" class="text-xs font-black text-yellow-500 italic uppercase">---</h2>
-                    <div id="innTag" class="text-[9px] font-black uppercase bg-black px-3 py-1 rounded-full text-slate-500">Innings 1</div>
-                </div>
-                <div class="flex justify-between items-end">
-                    <div>
-                        <h2 class="text-6xl font-black tracking-tighter" id="dispScore">0/0</h2>
-                        <p class="text-slate-500 font-bold text-sm">Overs: <span id="dispOvers" class="text-white">0.0</span> / <span id="limitOvers">5</span></p>
-                    </div>
-                    <div id="targetBox" class="hidden text-right">
-                        <p class="text-[9px] font-black text-blue-400 uppercase">Target</p>
-                        <p id="targetVal" class="text-3xl font-black text-blue-500">---</p>
-                    </div>
-                </div>
-                
-                <div class="mt-6 pt-4 border-t border-slate-800">
-                    <p class="text-[8px] font-black text-slate-500 uppercase mb-2 italic">This Over</p>
-                    <div id="overTimeline" class="flex gap-2 overflow-x-auto no-scrollbar"></div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3 mb-6">
-                <div class="bg-slate-900 p-4 rounded-3xl border-l-4 border-blue-500 shadow-xl">
-                    <p class="text-[8px] text-blue-400 font-black mb-1 uppercase">Striker</p>
-                    <p id="dispSName" class="font-bold truncate text-sm">---</p>
-                    <p id="dispSStats" class="text-xl font-black">0(0)</p>
-                </div>
-                <div class="bg-slate-900 p-4 rounded-3xl border-l-4 border-slate-700 shadow-xl">
-                    <p class="text-[8px] text-slate-500 font-black mb-1 uppercase">Non-Striker</p>
-                    <p id="dispNSName" class="font-bold truncate text-sm">---</p>
-                    <p id="dispNSStats" class="text-xl font-black">0(0)</p>
-                </div>
-                <div class="col-span-2 bg-slate-900 p-4 rounded-3xl border-l-4 border-red-600 flex justify-between items-center shadow-xl">
-                    <div><p class="text-[8px] text-red-500 font-black mb-1 uppercase">Bowler</p><p id="dispBName" class="font-bold text-lg">---</p></div>
-                    <p id="dispBStats" class="text-xl font-black">0-0 (0.0)</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="scorerPanel" class="hidden space-y-4 bg-slate-900 p-6 rounded-[2.5rem] border border-slate-800 shadow-2xl mt-4">
-            <div id="btnGrid" class="grid grid-cols-4 gap-2">
-                <button onclick="handleRun(0)" class="bg-black h-12 rounded-xl font-bold">0</button>
-                <button onclick="handleRun(1)" class="bg-black h-12 rounded-xl font-bold">1</button>
-                <button onclick="handleRun(2)" class="bg-black h-12 rounded-xl font-bold">2</button>
-                <button onclick="handleRun(3)" class="bg-black h-12 rounded-xl font-bold">3</button>
-                <button onclick="handleRun(4)" class="bg-blue-600 h-12 rounded-xl font-black">4</button>
-                <button onclick="handleRun(6)" class="bg-green-600 h-12 rounded-xl font-black">6</button>
-                <button onclick="openExtraMenu()" class="bg-yellow-600 h-12 rounded-xl font-black text-[10px]">EXTRA</button>
-                <button onclick="handleWicketFlow()" class="bg-red-600 h-12 rounded-xl font-black text-[10px]">OUT</button>
-            </div>
-            
-            <div id="extraMenu" class="hidden bg-black p-4 rounded-2xl grid grid-cols-2 gap-2">
-                <button onclick="handleExtra('WD')" class="bg-slate-800 p-3 rounded-lg text-xs font-bold">WIDE</button>
-                <button onclick="handleExtra('NB')" class="bg-slate-800 p-3 rounded-lg text-xs font-bold">NO BALL</button>
-            </div>
-
-            <div class="flex bg-black p-1 rounded-xl">
-                <button id="adminTab1" onclick="switchAdminTeam(1)" class="flex-1 py-2 rounded-lg text-[9px] font-black uppercase">Batting</button>
-                <button id="adminTab2" onclick="switchAdminTeam(2)" class="flex-1 py-2 rounded-lg text-[9px] font-black uppercase">Bowling</button>
-            </div>
-            <div class="flex gap-2">
-                <input id="newP" type="text" placeholder="Name" class="flex-1 bg-black p-3 rounded-xl text-xs outline-none">
-                <button onclick="addP()" class="bg-yellow-500 text-black px-6 rounded-xl font-black">+</button>
-            </div>
-            <div id="adminPList" class="space-y-1 max-h-40 overflow-y-auto no-scrollbar"></div>
-            <div class="flex gap-2 pt-2">
-                <button onclick="undo()" class="flex-1 bg-slate-800 py-3 rounded-xl text-[10px] font-bold">UNDO</button>
-                <button onclick="fullSystemReset()" class="flex-1 bg-red-900/20 py-3 rounded-xl text-[10px] font-bold text-red-500">RESET ALL</button>
-            </div>
-        </div>
-
-        <div id="statsContent" class="mt-6"></div>
+    <div id="waitingState" class="flex flex-col items-center justify-center p-12 text-center mt-20">
+        <div class="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mb-4 animate-bounce text-2xl">🏏</div>
+        <h2 class="text-xl font-black text-slate-500 uppercase italic">Waiting for Host...</h2>
     </div>
 
-    <div id="pointsOverlay" class="fixed inset-0 bg-black/95 z-[250] hidden p-6 flex items-center justify-center">
+    <div id="mainDashboard" class="max-w-md mx-auto p-4 hidden">
+        <div class="bg-slate-800 rounded-[2.5rem] p-6 shadow-2xl border-b-8 border-yellow-500 mb-6">
+            <div class="flex justify-between items-center mb-2">
+                <h2 id="batTeamDisp" class="text-xs font-black text-yellow-500 italic uppercase">---</h2>
+                <div id="innTag" class="text-[9px] font-black uppercase bg-slate-900 px-3 py-1 rounded-full text-slate-400">Innings 1</div>
+            </div>
+            <div class="flex justify-between items-end">
+                <div>
+                    <h2 class="text-6xl font-black tracking-tighter" id="dispScore">0/0</h2>
+                    <p class="text-slate-400 font-bold text-sm">Overs: <span id="dispOvers" class="text-white">0.0</span> / <span id="limitOvers">5</span></p>
+                </div>
+                <div id="targetBox" class="hidden text-right">
+                    <p class="text-[9px] font-black text-slate-500 uppercase">Target</p>
+                    <p id="targetVal" class="text-3xl font-black text-blue-500">---</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 mb-6">
+            <div class="bg-slate-800 p-4 rounded-3xl border-l-4 border-blue-500">
+                <p class="text-[8px] text-blue-400 font-black mb-1 uppercase">Striker</p>
+                <p id="dispSName" class="font-bold truncate text-sm">---</p>
+                <p id="dispSStats" class="text-xl font-black">0(0)</p>
+            </div>
+            <div class="bg-slate-800 p-4 rounded-3xl border-l-4 border-slate-600">
+                <p class="text-[8px] text-slate-400 font-black mb-1 uppercase">Non-Striker</p>
+                <p id="dispNSName" class="font-bold truncate text-sm">---</p>
+                <p id="dispNSStats" class="text-xl font-black">0(0)</p>
+            </div>
+            <div class="col-span-2 bg-slate-800 p-4 rounded-3xl border-l-4 border-red-500 flex justify-between items-center">
+                <div><p class="text-[8px] text-red-400 font-black mb-1 uppercase">Bowler</p><p id="dispBName" class="font-bold text-lg">---</p></div>
+                <p id="dispBStats" class="text-xl font-black">0-0 (0.0)</p>
+            </div>
+        </div>
+
+        <div id="scorerPanel" class="hidden space-y-4 mb-10 p-4 bg-slate-900/80 rounded-[2.5rem] border border-slate-800">
+            <div id="btnGrid" class="grid grid-cols-4 gap-2">
+                <button onclick="handleRun(0)" class="bg-slate-800 h-12 rounded-xl font-bold">0</button>
+                <button onclick="handleRun(1)" class="bg-slate-800 h-12 rounded-xl font-bold">1</button>
+                <button onclick="handleRun(2)" class="bg-slate-800 h-12 rounded-xl font-bold">2</button>
+                <button onclick="handleRun(3)" class="bg-slate-800 h-12 rounded-xl font-bold">3</button>
+                <button onclick="handleRun(4)" class="bg-blue-600 h-12 rounded-xl font-black">4</button>
+                <button onclick="handleRun(6)" class="bg-green-600 h-12 rounded-xl font-black">6</button>
+                <button onclick="handleWicket()" class="bg-red-600 h-12 rounded-xl font-black text-[10px]">WKT</button>
+                <button onclick="undo()" class="bg-slate-700 h-12 rounded-xl text-[10px] font-bold uppercase">Undo</button>
+            </div>
+            <div class="flex bg-slate-800 p-1 rounded-xl">
+                <button id="adminTab1" onclick="switchAdminTeam(1)" class="flex-1 py-2 rounded-lg text-[9px] font-black uppercase">Team A</button>
+                <button id="adminTab2" onclick="switchAdminTeam(2)" class="flex-1 py-2 rounded-lg text-[9px] font-black uppercase">Team B</button>
+            </div>
+            <div class="flex gap-2">
+                <input id="newP" type="text" placeholder="Player Name" class="flex-1 bg-slate-800 p-3 rounded-xl text-xs border border-slate-700 outline-none">
+                <button onclick="addP()" class="bg-yellow-500 text-black px-5 rounded-xl font-black">+</button>
+            </div>
+            <div id="adminPList" class="space-y-1 max-h-48 overflow-y-auto no-scrollbar"></div>
+            <button onclick="resetMatchOnly()" class="w-full bg-slate-800 p-3 rounded-xl text-[9px] font-black text-yellow-500 border border-slate-700 uppercase">Change Teams</button>
+            <button onclick="fullSystemReset()" class="w-full bg-red-900/20 p-2 rounded-xl text-[8px] font-black text-red-500 uppercase">⚠️ Total Clear</button>
+        </div>
+
+        <div id="statsContent"></div>
+    </div>
+
+    <div id="pointsOverlay" class="fixed inset-0 bg-slate-950/95 z-[250] hidden p-6 flex items-center justify-center">
         <div class="w-full max-w-sm">
             <h2 class="text-2xl font-black text-yellow-500 mb-4 text-center">STANDINGS</h2>
-            <div class="bg-slate-900 rounded-3xl p-4 border border-slate-800">
+            <div class="bg-slate-800 rounded-3xl p-4 border border-slate-700">
                 <table class="w-full text-left text-xs">
-                    <tr class="text-slate-500 border-b border-slate-800"><th class="p-3">TEAM</th><th>W</th><th>L</th><th class="p-3 text-right">PTS</th></tr>
+                    <tr class="text-slate-500 border-b border-slate-700"><th class="p-3">TEAM</th><th>W</th><th>L</th><th class="p-3 text-right">PTS</th></tr>
                     <tbody id="ptsBody"></tbody>
                 </table>
             </div>
@@ -143,20 +129,24 @@
     </div>
 
     <script>
+        // CONFIG
+        const ADMIN_PASS = "college123";
         const BIN_ID = "3bf04df403317e6901ba"; 
         const API_URL = `https://api.npoint.io/${BIN_ID}`;
-        const ADMIN_PASS = "college123";
 
         let state = {
             maxOvers: 5, runs: 0, wickers: 0, balls: 0,
             players: [], sIdx: null, nsIdx: null, bIdx: null,
             batTeam: '', bowlTeam: '', curBat: '', curInn: 1,
             target: null, isOverWaiting: false, matchEnded: false,
-            tournamentTeams: [], points: {}, overHistory: []
+            tournamentTeams: [], points: {}
         };
+        let history = [];
+        let activeAdminTeam = '';
         let isAdmin = false;
 
-        async function sync() {
+        // --- GLOBAL SYNC (ANY GMAIL / ANONYMOUS) ---
+        async function syncToCloud() {
             if(!isAdmin) return;
             try {
                 await fetch(API_URL, {
@@ -164,15 +154,15 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(state)
                 });
-            } catch (e) {}
+            } catch (e) { console.error("Sync Error"); }
         }
 
         async function autoRefresh() {
-            if(isAdmin) return;
+            if (isAdmin) return; // Admins don't overwrite their local data
             try {
-                const res = await fetch(API_URL, { cache: 'no-store' });
+                const res = await fetch(API_URL, { method: 'GET', cache: 'no-cache' });
                 const data = await res.json();
-                // ONLY update if there is actual tournament data in the cloud
+                // GATEKEEPER: Ensure we only pull if data is initialized
                 if(data && data.tournamentTeams && data.tournamentTeams.length > 0) {
                     state = data;
                     render();
@@ -181,8 +171,9 @@
         }
         setInterval(autoRefresh, 3000);
 
-        window.onload = autoRefresh;
+        window.onload = () => { autoRefresh(); };
 
+        // --- GAME LOGIC ---
         function toggleAdmin() {
             if(!isAdmin) {
                 if(prompt("Admin PIN:") === ADMIN_PASS) {
@@ -192,29 +183,26 @@
                     else if (!state.batTeam) showMatchSelector();
                     else document.getElementById('scorerPanel').classList.remove('hidden');
                 }
-            } else {
-                document.getElementById('scorerPanel').classList.toggle('hidden');
-            }
+            } else document.getElementById('scorerPanel').classList.toggle('hidden');
         }
 
-        // SETUP & MATCH LOGIC
         function generateTeamInputs() {
             const num = document.getElementById('numTeams').value;
             const container = document.getElementById('teamNamesContainer');
             container.innerHTML = '';
-            for(let i=1; i<=num; i++) container.innerHTML += `<input class="team-input w-full bg-black p-4 rounded-2xl border border-slate-800 text-sm mb-2 font-bold" placeholder="Team ${i}">`;
+            for(let i=1; i<=num; i++) container.innerHTML += `<input class="team-input w-full bg-slate-900 p-4 rounded-2xl border border-slate-700 text-sm mb-2 font-bold" placeholder="Team ${i} Name">`;
             document.getElementById('setupStep1').classList.add('hidden');
             document.getElementById('setupStep2').classList.remove('hidden');
         }
 
         function saveTournamentConfig() {
             const inputs = document.querySelectorAll('.team-input');
-            state.tournamentTeams = Array.from(inputs).map(i => i.value || `T${Math.floor(Math.random()*99)}`);
+            state.tournamentTeams = Array.from(inputs).map(i => i.value || `Team ${Math.floor(Math.random()*100)}`);
             state.maxOvers = parseInt(document.getElementById('setupOvers').value) || 5;
             state.tournamentTeams.forEach(t => state.points[t] = {w:0, l:0, p:0});
             document.getElementById('setupOverlay').classList.add('hidden');
             showMatchSelector();
-            sync();
+            syncToCloud();
         }
 
         function showMatchSelector() {
@@ -235,118 +223,141 @@
             state.matchEnded = false;
             activeAdminTeam = state.batTeam;
             document.getElementById('matchSelector').classList.add('hidden');
+            document.getElementById('waitingState').classList.add('hidden');
+            document.getElementById('mainDashboard').classList.remove('hidden');
+            document.getElementById('scorerPanel').classList.remove('hidden');
             render();
-            sync();
+            syncToCloud();
         }
 
-        // SCORING LOGIC
         function handleRun(r) {
-            if(state.sIdx===null || state.bIdx===null) return alert("Select Batter & Bowler");
+            if(state.sIdx === null || state.nsIdx === null || state.bIdx === null) return alert("Assign Striker & Bowler");
+            saveUndo();
             state.runs += r; state.balls++;
             state.players[state.sIdx].r += r; state.players[state.sIdx].b++;
             state.players[state.bIdx].rc += r; state.players[state.bIdx].bb++;
-            state.overHistory.push(r.toString());
             if(r % 2 !== 0) swap();
             if(state.balls % 6 === 0) { state.isOverWaiting = true; swap(); }
-            render(); sync();
+            render(); syncToCloud();
         }
 
-        function handleExtra(type) {
-            let extraRuns = parseInt(prompt("Extra runs taken?", "0")) || 0;
-            let total = 1 + extraRuns;
-            state.runs += total;
-            state.players[state.bIdx].rc += total;
-            if(type === 'NB') {
-                state.players[state.sIdx].r += extraRuns;
-                state.players[state.sIdx].b++;
-                state.overHistory.push(`Nb${extraRuns > 0 ? '+'+extraRuns : ''}`);
-            } else {
-                state.overHistory.push(`Wd${extraRuns > 0 ? '+'+extraRuns : ''}`);
-            }
-            if(extraRuns % 2 !== 0) swap();
-            document.getElementById('extraMenu').classList.add('hidden');
-            render(); sync();
-        }
-
-        function handleWicketFlow() {
-            let isNormal = confirm("OK for Caught/Bowled\nCANCEL for Run-Out");
-            if(isNormal) {
-                state.wickers++; state.balls++;
-                state.players[state.bIdx].w++; state.players[state.bIdx].bb++;
-                state.players[state.sIdx].isOut = true; state.sIdx = null;
-                state.overHistory.push('W');
-            } else {
-                let runsComp = parseInt(prompt("Runs completed?", "0")) || 0;
-                state.runs += runsComp; state.balls++;
-                state.players[state.sIdx].r += runsComp; state.players[state.sIdx].b++;
-                state.players[state.bIdx].rc += runsComp; state.players[state.bIdx].bb++;
-                if(confirm("Is Striker Out?")) { state.players[state.sIdx].isOut = true; state.sIdx = null; }
-                else { state.players[state.nsIdx].isOut = true; state.nsIdx = null; }
-                state.wickers++;
-                state.overHistory.push(`W(${runsComp})`);
-            }
+        function handleWicket() {
+            if(state.sIdx === null) return;
+            saveUndo();
+            state.wickers++; state.balls++;
+            state.players[state.bIdx].w++; state.players[state.bIdx].bb++;
+            state.players[state.sIdx].isOut = true; state.sIdx = null;
             if(state.balls % 6 === 0) { state.isOverWaiting = true; swap(); }
-            render(); sync();
+            render(); syncToCloud();
         }
 
         function render() {
-            if(!state.batTeam) {
-                document.getElementById('waitingState').classList.remove('hidden');
-                document.getElementById('liveDashboard').classList.add('hidden');
-                return;
-            }
-            document.getElementById('waitingState').classList.add('hidden');
-            document.getElementById('liveDashboard').classList.remove('hidden');
-
             document.getElementById('dispScore').innerText = `${state.runs}/${state.wickers}`;
             document.getElementById('dispOvers').innerText = `${Math.floor(state.balls/6)}.${state.balls%6}`;
-            document.getElementById('batTeamDisp').innerText = state.curBat;
             document.getElementById('limitOvers').innerText = state.maxOvers;
-            document.getElementById('innTag').innerText = `Innings ${state.curInn}`;
+            document.getElementById('batTeamDisp').innerText = state.curBat;
+            document.getElementById('mainDashboard').classList.remove('hidden');
+            document.getElementById('waitingState').classList.add('hidden');
 
-            document.getElementById('overTimeline').innerHTML = state.overHistory.map(ball => {
-                let color = ball.includes('W') ? 'bg-red-600' : (ball==='4' || ball==='6' ? 'bg-blue-600' : 'bg-slate-800');
-                return `<div class="ball-dot ${color}">${ball}</div>`;
-            }).join('');
+            const lock = state.balls > 0 && state.balls % 6 === 0 && state.isOverWaiting;
+            document.getElementById('btnGrid').style.opacity = lock ? "0.3" : "1";
+            document.getElementById('btnGrid').style.pointerEvents = lock ? "none" : "auto";
 
             if(state.curInn === 2) {
                 document.getElementById('targetBox').classList.remove('hidden');
                 document.getElementById('targetVal').innerText = state.target;
             } else document.getElementById('targetBox').classList.add('hidden');
 
-            updateHUD();
-            renderStats();
+            updateHUD('dispSName', 'dispSStats', state.sIdx);
+            updateHUD('dispNSName', 'dispNSStats', state.nsIdx);
+            if(state.bIdx !== null && state.players[state.bIdx]) {
+                const b = state.players[state.bIdx];
+                document.getElementById('dispBName').innerText = b.name;
+                document.getElementById('dispBStats').innerText = `${b.rc}-${b.w} (${Math.floor(b.bb/6)}.${b.bb%6})`;
+            }
             renderAdminList();
-            checkRules();
+            renderStats();
+            if(state.balls > 0) checkLogic();
         }
 
-        function checkRules() {
+        function checkLogic() {
             if(state.matchEnded) return;
             const oversDone = state.balls >= (state.maxOvers * 6);
-            const allOut = state.wickers >= 10 || (state.players.length > 0 && state.players.filter(p=>p.team===state.curBat && !p.isOut).length < 1);
-            
-            if(state.curInn === 1 && (oversDone || allOut)) {
-                state.target = state.runs + 1;
-                state.curInn = 2; state.curBat = state.bowlTeam;
+            const allOut = state.wickers >= 10 || state.players.filter(p => p.team === state.curBat && !p.isOut).length < 1;
+            if(state.curInn === 2) {
+                if(state.runs >= state.target) finish(state.curBat, state.curBat === state.batTeam ? state.bowlTeam : state.batTeam);
+                else if(oversDone || allOut) finish(state.curBat === state.batTeam ? state.bowlTeam : state.batTeam, state.curBat);
+            } else if(oversDone || allOut) {
+                state.target = state.runs + 1; state.curInn = 2; state.curBat = state.bowlTeam;
                 state.runs = 0; state.wickers = 0; state.balls = 0;
-                state.sIdx = state.nsIdx = state.bIdx = null;
-                state.overHistory = [];
-                state.players.forEach(p => p.isOut = false); 
-                alert("1st Innings Over! Target: " + state.target);
-                render(); sync();
-            } else if (state.curInn === 2) {
-                if(state.runs >= state.target) finish(state.curBat);
-                else if(oversDone || allOut) finish(state.curBat===state.batTeam ? state.bowlTeam : state.batTeam);
+                state.sIdx = state.nsIdx = state.bIdx = null; state.isOverWaiting = false;
+                alert(`Target: ${state.target}`);
+                render(); syncToCloud();
             }
         }
 
-        function finish(w) { state.matchEnded = true; state.points[w].w++; state.points[w].p++; alert("Winner: " + w); sync(); }
-        function updateHUD() {
-            if(state.sIdx!==null && state.players[state.sIdx]) {
-                document.getElementById('dispSName').innerText = state.players[state.sIdx].name;
-                document.getElementById('dispSStats').innerText = `${state.players[state.sIdx].r}(${state.players[state.sIdx].b})`;
-            } else { document.getElementById('dispSName').innerText = "---"; document.getElementById('dispSStats').innerText = "0(0)"; }
-            
-            if(state.nsIdx!==null && state.players[state.nsIdx]) {
-                document.getElementById('dispNSName').innerText = state.players[state.nsIdx].name;
-                document.getElementById('dispNSStats').innerText = `${state.playe
+        function finish(w, l) {
+            state.matchEnded = true; state.points[w].w++; state.points[w].p++; state.points[l].l++;
+            render(); syncToCloud(); alert(`Winner: ${w}`); togglePoints();
+        }
+
+        function addP() {
+            const n = document.getElementById('newP').value;
+            if(!n) return;
+            state.players.push({name:n, team:activeAdminTeam, r:0, b:0, w:0, rc:0, bb:0, isOut:false});
+            document.getElementById('newP').value = '';
+            render(); syncToCloud();
+        }
+
+        function renderAdminList() {
+            const list = document.getElementById('adminPList');
+            document.getElementById('adminTab1').innerText = state.batTeam || 'Team A';
+            document.getElementById('adminTab2').innerText = state.bowlTeam || 'Team B';
+            list.innerHTML = '';
+            state.players.filter(p => p.team === activeAdminTeam).forEach((p) => {
+                const i = state.players.indexOf(p);
+                const isBatSide = p.team === state.curBat;
+                list.innerHTML += `<div class="flex justify-between items-center bg-slate-800 p-2 rounded-xl mb-1 ${p.isOut?'opacity-30':''}">
+                    <span class="text-[10px] font-bold uppercase">${p.name}</span>
+                    <div class="flex gap-1">
+                        ${isBatSide && !p.isOut && i!==state.sIdx && i!==state.nsIdx ? `<button onclick="setField(${i},'S')" class="text-[8px] bg-blue-900 p-1 px-2 rounded">STR</button>` : ''}
+                        ${isBatSide && !p.isOut && i!==state.sIdx && i!==state.nsIdx ? `<button onclick="setField(${i},'NS')" class="text-[8px] bg-slate-700 p-1 px-2 rounded">NON</button>` : ''}
+                        ${!isBatSide && i!==state.bIdx ? `<button onclick="setField(${i},'B')" class="text-[8px] bg-red-900 p-1 px-2 rounded">BOWL</button>` : ''}
+                    </div>
+                </div>`;
+            });
+        }
+
+        function renderStats() {
+            const cont = document.getElementById('statsContent');
+            cont.innerHTML = [state.batTeam, state.bowlTeam].filter(t => t!=='').map(t => {
+                const pList = state.players.filter(p => p.team === t);
+                return `<div class="mb-4 bg-slate-800 p-5 rounded-3xl border border-slate-700">
+                    <p class="text-[10px] font-black text-yellow-500 uppercase mb-3">${t} Card</p>
+                    <table class="w-full text-[10px] text-left">
+                        <tr class="text-slate-500 uppercase border-b border-slate-700/50"><th>Batter</th><th>R(B)</th><th>W-R</th></tr>
+                        ${pList.map(p => `<tr class="border-b border-slate-700/20"><td class="py-2 font-bold ${p.isOut?'line-through opacity-30':''}">${p.name}</td><td>${p.r}(${p.b})</td><td>${p.w}-${p.rc}</td></tr>`).join('')}
+                    </table>
+                </div>`
+            }).join('');
+        }
+
+        function switchAdminTeam(side) { activeAdminTeam = (side === 1) ? state.batTeam : state.bowlTeam; renderAdminList(); }
+        function setField(i, r) { if(r==='S') state.sIdx=i; if(r==='NS') state.nsIdx=i; if(r==='B'){state.bIdx=i; state.isOverWaiting=false;} render(); syncToCloud(); }
+        function swap() { let t = state.sIdx; state.sIdx = state.nsIdx; state.nsIdx = t; }
+        function updateHUD(idN, idS, idx) {
+            if(idx!==null && state.players[idx]){ const p=state.players[idx]; document.getElementById(idN).innerText=p.name; document.getElementById(idS).innerText=`${p.r}(${p.b})`; }
+            else { document.getElementById(idN).innerText="---"; document.getElementById(idS).innerText="0(0)"; }
+        }
+        function togglePoints() {
+            const tbody = document.getElementById('ptsBody');
+            tbody.innerHTML = Object.keys(state.points).map(t => `<tr><td class="p-3 font-bold">${t}</td><td>${state.points[t].w}</td><td>${state.points[t].l}</td><td class="p-3 text-right font-black text-yellow-500">${state.points[t].p}</td></tr>`).join('');
+            document.getElementById('pointsOverlay').classList.toggle('hidden');
+        }
+        function saveUndo() { history.push(JSON.stringify(state)); }
+        function undo() { if(history.length>0) { state=JSON.parse(history.pop()); render(); syncToCloud(); } }
+        function resetMatchOnly() { state.batTeam = ''; state.players=[]; state.runs=0; state.balls=0; state.curInn=1; state.sIdx=state.nsIdx=state.bIdx=null; showMatchSelector(); syncToCloud(); }
+        function fullSystemReset() { if(confirm("Wipe Everything?")) { state = { maxOvers: 5, runs: 0, wickers: 0, balls: 0, players: [], sIdx: null, nsIdx: null, bIdx: null, batTeam: '', bowlTeam: '', curBat: '', curInn: 1, target: null, isOverWaiting: false, matchEnded: false, tournamentTeams: [], points: {} }; syncToCloud(); location.reload(); } }
+    </script>
+</body>
+</html>
