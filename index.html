@@ -1,197 +1,219 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sunday Live Pro</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .ball-dot { @apply w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-black border border-slate-700 flex-shrink-0; }
-        .admin-input { @apply bg-slate-950 p-3 rounded-xl border border-slate-800 text-sm focus:border-yellow-500 outline-none w-full; }
-        .btn-add { @apply bg-yellow-600 hover:bg-yellow-500 text-black font-black px-4 rounded-xl transition-all; }
-    </style>
-</head>
-<body class="bg-[#0b0f1a] text-slate-100 min-h-screen pb-24 font-sans">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sunday League Live</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body { background:#0f172a; color:white; }
+.no-scrollbar::-webkit-scrollbar { display:none; }
+</style>
+</head><body class="p-4"><h1 class="text-center text-xl font-black text-yellow-400 mb-4">🏏 LIVE SCORE</h1><div class="text-center mb-4">
+<h2 id="score" class="text-4xl font-black">0/0</h2>
+<p>Overs: <span id="overs">0.0</span></p>
+<p id="target"></p>
+</div><div id="overDisplay" class="flex gap-2 flex-wrap justify-center mb-3"></div>
+<div id="fow" class="text-xs text-slate-400 text-center mb-4"></div><div class="grid grid-cols-4 gap-2 mb-4">
+<button onclick="run(0)">0</button>
+<button onclick="run(1)">1</button>
+<button onclick="run(2)">2</button>
+<button onclick="run(3)">3</button>
+<button onclick="run(4)">4</button>
+<button onclick="run(6)">6</button>
+<button onclick="wicket()">W</button>
+<button onclick="undo()">Undo</button><button onclick="noBall(0)">NB+0</button>
+<button onclick="noBall(1)">NB+1</button>
+<button onclick="noBall(2)">NB+2</button>
+<button onclick="noBall(3)">NB+3</button>
+<button onclick="noBall(4)">NB+4</button>
+<button onclick="noBall(6)">NB+6</button>
 
-    <nav class="p-4 flex justify-between items-center bg-slate-900/90 backdrop-blur-md sticky top-0 z-50 border-b border-slate-800">
-        <h1 class="font-black italic text-yellow-500 tracking-tighter text-xl uppercase">Sunday Live</h1>
-        <button onclick="toggleAdmin()" id="adminBtn" class="text-[10px] bg-slate-800 px-4 py-2 rounded-full font-bold uppercase tracking-widest border border-slate-700">Admin Login</button>
-    </nav>
+<button onclick="wide()">WD</button>
 
-    <div class="max-w-md mx-auto p-4">
-        
-        <div id="liveDashboard">
-            <div class="bg-slate-900 rounded-[2rem] p-6 border border-slate-800 shadow-2xl mb-4 text-center">
-                <h2 id="batTeamDisp" class="text-sm font-black text-yellow-400 uppercase tracking-widest mb-2">Team A</h2>
-                <div class="flex items-baseline justify-center gap-2">
-                    <h2 class="text-6xl font-black tracking-tighter" id="dispScore">0/0</h2>
-                    <p class="text-slate-400 font-bold text-lg">(<span id="dispOvers">0.0</span>/<span id="limitOvers">5</span>)</p>
-                </div>
-            </div>
-        </div>
+<button onclick="runOut(1)">RO+1</button>
+<button onclick="runOut(2)">RO+2</button>
+<button onclick="runOut(3)">RO+3</button>
 
-        <div id="adminPanel" class="hidden space-y-6 animate-in fade-in duration-300">
-            
-            <div class="bg-slate-900 p-6 rounded-[2rem] border border-slate-800 space-y-4">
-                <p class="text-[10px] font-black text-yellow-500 uppercase tracking-widest">1. Set Match Basics</p>
-                <div class="grid grid-cols-2 gap-2">
-                    <input id="teamAInput" type="text" placeholder="Team A Name" class="admin-input">
-                    <input id="teamBInput" type="text" placeholder="Team B Name" class="admin-input">
-                </div>
-                <input id="oversInput" type="number" placeholder="Total Overs (e.g. 5)" class="admin-input">
-            </div>
+</div><input id="playerName" placeholder="Player Name" class="w-full p-2 mb-2 text-black">
+<button onclick="addPlayer()" class="bg-yellow-400 w-full p-2 text-black font-bold">Add Player</button><div id="players" class="mt-4"></div>
+<div id="stats" class="mt-6"></div><script>
 
-            <div class="bg-slate-900 p-6 rounded-[2rem] border border-slate-800 space-y-4">
-                <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest">2. Add Players to Squad</p>
-                
-                <div class="space-y-3">
-                    <div class="flex gap-2">
-                        <input id="pNameA" type="text" placeholder="Team A Player Name" class="admin-input">
-                        <button onclick="addPlayer('A')" class="btn-add">ADD</button>
-                    </div>
-                    <div class="flex gap-2">
-                        <input id="pNameB" type="text" placeholder="Team B Player Name" class="admin-input">
-                        <button onclick="addPlayer('B')" class="btn-add">ADD</button>
-                    </div>
-                </div>
+let state = {
+runs:0,wickets:0,balls:0,maxOvers:5,
+players:[],s:null,ns:null,b:null,
+target:null,innings:1,
+over:[],fow:[]
+};
 
-                <div class="pt-2 border-t border-slate-800">
-                    <p class="text-[9px] text-slate-500 uppercase font-bold mb-2">Current Squads:</p>
-                    <div id="squadList" class="text-[10px] text-slate-400 grid grid-cols-2 gap-2"></div>
-                </div>
-            </div>
+let history=[];
 
-            <div class="bg-slate-900 p-5 rounded-[2.5rem] border border-slate-800 space-y-4">
-                <p class="text-[10px] font-black text-green-500 uppercase tracking-widest text-center">3. Scoring Controls</p>
-                <div class="grid grid-cols-4 gap-2">
-                    <button onclick="handleRun(0)" class="bg-slate-950 h-12 rounded-xl border border-slate-800 font-bold">0</button>
-                    <button onclick="handleRun(1)" class="bg-slate-950 h-12 rounded-xl border border-slate-800 font-bold">1</button>
-                    <button onclick="handleRun(2)" class="bg-slate-950 h-12 rounded-xl border border-slate-800 font-bold">2</button>
-                    <button onclick="handleRun(3)" class="bg-slate-950 h-12 rounded-xl border border-slate-800 font-bold">3</button>
-                    <button onclick="handleRun(4)" class="bg-blue-600 h-12 rounded-xl font-black">4</button>
-                    <button onclick="handleRun(6)" class="bg-green-600 h-12 rounded-xl font-black">6</button>
-                    <button onclick="handleWicketFlow()" class="bg-red-600 h-12 rounded-xl font-black text-[10px]">OUT</button>
-                    <button onclick="clearForInjury()" class="bg-orange-600 h-12 rounded-xl font-black text-[9px]">INJURY</button>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-800">
-                    <div>
-                        <p class="text-[8px] font-black text-blue-400 uppercase mb-2">Select Batsman</p>
-                        <div id="adminBatList" class="space-y-1"></div>
-                    </div>
-                    <div>
-                        <p class="text-[8px] font-black text-red-400 uppercase mb-2">Select Bowler</p>
-                        <div id="adminBowlList" class="space-y-1"></div>
-                    </div>
-                </div>
-            </div>
+function save(){ history.push(JSON.stringify(state)); }
+function undo(){ if(history.length) state=JSON.parse(history.pop()); render(); }
 
-            <div class="pt-4">
-                <button onclick="resetAllData()" class="w-full bg-red-900/30 border border-red-500/50 text-red-500 py-3 rounded-xl font-black text-xs uppercase tracking-widest">
-                    ⚠️ Reset Entire Match
-                </button>
-            </div>
-        </div>
+function addPlayer(){
+let n=document.getElementById('playerName').value;
+if(!n) return;
+state.players.push({name:n,r:0,b:0,w:0,rc:0,bb:0,out:false});
+document.getElementById('playerName').value='';
+render();
+}
 
-        <div id="statsContent" class="mt-8 space-y-4"></div>
-    </div>
+function run(r){
+if(state.s==null||state.b==null) return alert("Select players");
+save();
 
-    <script>
-        const BIN_ID = "3bf04df403317e6901ba"; 
-        const API_URL = `https://api.npoint.io/${BIN_ID}`;
-        const ADMIN_PASS = "college123";
+state.runs+=r;
+state.balls++;
 
-        let state = {
-            maxOvers: 5, runs: 0, wickers: 0, balls: 0,
-            players: [], sIdx: null, nsIdx: null, bIdx: null,
-            batTeam: 'Team A', curBat: 'Team A', overHistory: []
-        };
-        let isAdmin = false;
+state.players[state.s].r+=r;
+state.players[state.s].b++;
 
-        function toggleAdmin() {
-            if(!isAdmin) {
-                if(prompt("Admin PIN:") === ADMIN_PASS) {
-                    isAdmin = true;
-                    document.getElementById('adminPanel').classList.remove('hidden');
-                    document.getElementById('adminBtn').innerText = "Exit Admin";
-                }
-            } else {
-                isAdmin = false;
-                document.getElementById('adminPanel').classList.add('hidden');
-                document.getElementById('adminBtn').innerText = "Admin Login";
-            }
-            render();
-        }
+state.players[state.b].rc+=r;
+state.players[state.b].bb++;
 
-        function addPlayer(type) {
-            const inputId = type === 'A' ? 'pNameA' : 'pNameB';
-            const teamName = type === 'A' ? (document.getElementById('teamAInput').value || 'Team A') : (document.getElementById('teamBInput').value || 'Team B');
-            const name = document.getElementById(inputId).value;
-            if(!name) return;
-            
-            state.players.push({name: name, team: teamName, r:0, b:0, isOut:false, rc:0, bb:0, w:0});
-            document.getElementById(inputId).value = '';
-            render(); sync();
-        }
+state.over.push(r);
 
-        function resetAllData() {
-            if(confirm("Are you sure? This deletes ALL scores and players.")) {
-                state = { maxOvers: 5, runs: 0, wickers: 0, balls: 0, players: [], sIdx: null, nsIdx: null, bIdx: null, batTeam: 'Team A', curBat: 'Team A', overHistory: [] };
-                render(); sync();
-            }
-        }
+if(r%2) swap();
 
-        // Logic functions (handleRun, handleWicket, render, sync) same as previous for stability
-        function handleRun(r) {
-            if(state.sIdx === null || state.bIdx === null) return alert("Select Strike/Bowler!");
-            state.runs += r; state.balls++;
-            state.players[state.sIdx].r += r; state.players[state.sIdx].b++;
-            state.players[state.bIdx].rc += r; state.players[state.bIdx].bb++;
-            if(r % 2 !== 0) swap();
-            if(state.balls % 6 === 0) { state.bIdx = null; alert("Over Over!"); }
-            render(); sync();
-        }
+overCheck();
+render();
+}
 
-        function setField(i, type) { 
-            if(type==='S') state.sIdx = i; else if(type==='NS') state.nsIdx = i; else state.bIdx = i; 
-            render(); sync(); 
-        }
+function wicket(){
+if(state.s==null) return;
+save();
 
-        function swap() { let t = state.sIdx; state.sIdx = state.nsIdx; state.nsIdx = t; }
-        function clearForInjury() { state.sIdx = null; state.nsIdx = null; render(); }
-        async function sync() { if(isAdmin) await fetch(API_URL, {method:'POST', body:JSON.stringify(state), headers:{'Content-Type':'application/json'}}); }
+state.fow.push(`${state.runs}/${state.wickets+1} (${state.players[state.s].name}, ${overs()})`);
 
-        function render() {
-            document.getElementById('batTeamDisp').innerText = state.curBat;
-            document.getElementById('dispScore').innerText = `${state.runs}/${state.wickers}`;
-            document.getElementById('dispOvers').innerText = `${Math.floor(state.balls/6)}.${state.balls%6}`;
+state.wickets++;
+state.balls++;
 
-            const squadBox = document.getElementById('squadList');
-            const batL = document.getElementById('adminBatList');
-            const bowlL = document.getElementById('adminBowlList');
-            
-            squadBox.innerHTML = ''; batL.innerHTML = ''; bowlL.innerHTML = '';
+state.players[state.s].out=true;
+state.players[state.b].w++;
+state.players[state.b].bb++;
 
-            state.players.forEach((p, i) => {
-                squadBox.innerHTML += `<div>${p.name} (${p.team})</div>`;
-                if(p.isOut) return;
-                
-                const btn = (type, color) => `<button onclick="setField(${i},'${type}')" class="bg-${color}-900 px-2 py-1 rounded text-[7px] font-black">${type}</button>`;
-                
-                if(p.team === state.curBat) {
-                    batL.innerHTML += `<div class="flex justify-between items-center bg-slate-950 p-1 rounded mb-1 border border-slate-800">
-                        <span class="text-[9px] truncate w-16">${p.name}</span>
-                        <div class="flex gap-1">${state.sIdx===null?btn('S','blue'):''}${state.nsIdx===null?btn('NS','slate'):''}</div>
-                    </div>`;
-                } else {
-                    bowlL.innerHTML += `<div class="flex justify-between items-center bg-slate-950 p-1 rounded mb-1 border border-slate-800">
-                        <span class="text-[9px] truncate w-16">${p.name}</span>
-                        ${state.bIdx===null?btn('B','red'):''}
-                    </div>`;
-                }
-            });
-        }
-    </script>
-</body>
+state.over.push("W");
+
+state.s=null;
+
+overCheck();
+render();
+}
+
+function runOut(r){
+if(state.s==null||state.ns==null) return;
+save();
+
+state.runs+=r;
+state.balls++;
+
+state.players[state.s].r+=r;
+state.players[state.s].b++;
+
+state.wickets++;
+
+state.fow.push(`${state.runs}/${state.wickets} (${state.players[state.s].name}, ${overs()})`);
+
+state.players[state.s].out=true;
+
+state.over.push(r+"W");
+
+if(r%2==0) state.s=state.ns;
+else state.s=state.ns;
+
+state.ns=null;
+
+overCheck();
+render();
+}
+
+function noBall(r){
+save();
+
+state.runs+=(1+r);
+state.players[state.s].r+=r;
+state.players[state.b].rc+=(1+r);
+
+state.over.push("NB+"+r);
+
+render();
+}
+
+function wide(){
+save();
+state.runs+=1;
+state.players[state.b].rc+=1;
+state.over.push("WD");
+render();
+}
+
+function swap(){ let t=state.s; state.s=state.ns; state.ns=t; }
+
+function overCheck(){
+if(state.balls%6==0){
+swap();
+state.over=[];
+}
+}
+
+function overs(){
+return Math.floor(state.balls/6)+"."+(state.balls%6);
+}
+
+function render(){
+
+document.getElementById('score').innerText=`${state.runs}/${state.wickets}`;
+document.getElementById('overs').innerText=overs();
+
+document.getElementById('overDisplay').innerHTML=
+state.over.map(x=>`<span class="bg-slate-700 px-2">${x}</span>`).join('');
+
+document.getElementById('fow').innerText=state.fow.join(" • ");
+
+let list="";
+state.players.forEach((p,i)=>{
+list+=`
+<div class="flex justify-between text-sm mb-1">
+${p.name}
+<div>
+<button onclick="state.s=${i}">S</button>
+<button onclick="state.ns=${i}">NS</button>
+<button onclick="state.b=${i}">B</button>
+</div>
+</div>`;
+});
+document.getElementById('players').innerHTML=list;
+
+let bat=`<h2 class="text-yellow-400">Batting</h2>
+<table class="w-full text-xs">
+<tr><th>Name</th><th>R</th><th>B</th><th>SR</th></tr>
+${state.players.map(p=>`
+<tr class="${p.out?'text-slate-500':''}">
+<td>${p.name}${p.out?'':'*'}</td>
+<td>${p.r}</td>
+<td>${p.b}</td>
+<td>${p.b?((p.r/p.b)*100).toFixed(1):0}</td>
+</tr>`).join('')}
+</table>`;
+
+let bowl=`<h2 class="text-blue-400 mt-4">Bowling</h2>
+<table class="w-full text-xs">
+<tr><th>Name</th><th>O</th><th>R</th><th>W</th><th>Econ</th></tr>
+${state.players.filter(p=>p.bb>0).map(p=>`
+<tr>
+<td>${p.name}</td>
+<td>${Math.floor(p.bb/6)}.${p.bb%6}</td>
+<td>${p.rc}</td>
+<td>${p.w}</td>
+<td>${p.bb?(p.rc/(p.bb/6)).toFixed(2):0}</td>
+</tr>`).join('')}
+</table>`;
+
+document.getElementById('stats').innerHTML=bat+bowl;
+
+}
+
+render();
+
+</script></body>
 </html>
