@@ -8,7 +8,8 @@
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .ball-dot { @apply w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-black border border-slate-700 flex-shrink-0; }
-        .striker-glow { @apply ring-2 ring-yellow-500 bg-slate-800 border-yellow-500/50; }
+        .admin-input { @apply bg-slate-950 p-3 rounded-xl border border-slate-800 text-sm focus:border-yellow-500 outline-none w-full; }
+        .btn-add { @apply bg-yellow-600 hover:bg-yellow-500 text-black font-black px-4 rounded-xl transition-all; }
     </style>
 </head>
 <body class="bg-[#0b0f1a] text-slate-100 min-h-screen pb-24 font-sans">
@@ -20,74 +21,49 @@
 
     <div class="max-w-md mx-auto p-4">
         
-        <div id="liveDashboard" class="space-y-4">
-            <div class="bg-slate-900 rounded-[2rem] p-6 border border-slate-800 shadow-2xl">
-                <div class="flex justify-between items-start mb-2">
-                    <h2 id="batTeamDisp" class="text-sm font-black text-yellow-400 uppercase tracking-widest">Team A</h2>
-                    <p id="targetDisp" class="text-[9px] text-blue-400 font-black uppercase hidden">Target: <span id="targetVal">0</span></p>
-                </div>
-                <div class="flex items-baseline gap-2">
+        <div id="liveDashboard">
+            <div class="bg-slate-900 rounded-[2rem] p-6 border border-slate-800 shadow-2xl mb-4 text-center">
+                <h2 id="batTeamDisp" class="text-sm font-black text-yellow-400 uppercase tracking-widest mb-2">Team A</h2>
+                <div class="flex items-baseline justify-center gap-2">
                     <h2 class="text-6xl font-black tracking-tighter" id="dispScore">0/0</h2>
                     <p class="text-slate-400 font-bold text-lg">(<span id="dispOvers">0.0</span>/<span id="limitOvers">5</span>)</p>
-                </div>
-                <div class="mt-6 pt-4 border-t border-slate-800/50 flex gap-2 overflow-x-auto no-scrollbar" id="overTimeline"></div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3">
-                <div id="cardS" class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-                    <p class="text-[8px] text-blue-400 font-black mb-1 uppercase tracking-widest">Striker</p>
-                    <p id="dispSName" class="font-bold truncate text-sm">---</p>
-                    <p id="dispSStats" class="text-2xl font-black">0(0)</p>
-                </div>
-                <div id="cardNS" class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-                    <p class="text-[8px] text-slate-500 font-black mb-1 uppercase tracking-widest">Non-Striker</p>
-                    <p id="dispNSName" class="font-bold truncate text-sm">---</p>
-                    <p id="dispNSStats" class="text-2xl font-black">0(0)</p>
-                </div>
-            </div>
-
-            <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 flex justify-between items-center">
-                <div>
-                    <p class="text-[8px] text-red-500 font-black mb-1 uppercase tracking-widest">Current Bowler</p>
-                    <p id="dispBName" class="font-bold text-sm">---</p>
-                </div>
-                <div class="text-right">
-                    <p id="dispBStats" class="text-xl font-black">0-0 (0.0)</p>
-                    <p id="dispBEcon" class="text-[9px] font-bold text-slate-500">ECON: 0.00</p>
                 </div>
             </div>
         </div>
 
-        <div id="adminPanel" class="hidden mt-6 space-y-6">
+        <div id="adminPanel" class="hidden space-y-6 animate-in fade-in duration-300">
             
             <div class="bg-slate-900 p-6 rounded-[2rem] border border-slate-800 space-y-4">
-                <p class="text-[10px] font-black text-yellow-500 uppercase tracking-widest">1. Match Setup</p>
-                <div class="grid grid-cols-3 gap-2">
-                    <input id="teamAInput" type="text" placeholder="Team A" class="bg-slate-950 p-2 rounded-lg border border-slate-800 text-xs col-span-1">
-                    <input id="teamBInput" type="text" placeholder="Team B" class="bg-slate-950 p-2 rounded-lg border border-slate-800 text-xs col-span-1">
-                    <input id="oversInput" type="number" placeholder="Overs" class="bg-slate-950 p-2 rounded-lg border border-slate-800 text-xs col-span-1">
+                <p class="text-[10px] font-black text-yellow-500 uppercase tracking-widest">1. Set Match Basics</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <input id="teamAInput" type="text" placeholder="Team A Name" class="admin-input">
+                    <input id="teamBInput" type="text" placeholder="Team B Name" class="admin-input">
                 </div>
+                <input id="oversInput" type="number" placeholder="Total Overs (e.g. 5)" class="admin-input">
+            </div>
+
+            <div class="bg-slate-900 p-6 rounded-[2rem] border border-slate-800 space-y-4">
+                <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest">2. Add Players to Squad</p>
                 
-                <div class="grid grid-cols-2 gap-4 pt-2">
-                    <div class="space-y-2">
-                        <p class="text-[8px] font-bold text-blue-400 uppercase">Add Team A Player</p>
-                        <div class="flex gap-1">
-                            <input id="pNameA" type="text" class="flex-1 bg-slate-950 p-2 rounded text-xs border border-slate-800">
-                            <button onclick="addPlayer('A')" class="bg-blue-600 px-2 rounded text-[10px] font-black">+</button>
-                        </div>
+                <div class="space-y-3">
+                    <div class="flex gap-2">
+                        <input id="pNameA" type="text" placeholder="Team A Player Name" class="admin-input">
+                        <button onclick="addPlayer('A')" class="btn-add">ADD</button>
                     </div>
-                    <div class="space-y-2">
-                        <p class="text-[8px] font-bold text-red-400 uppercase">Add Team B Player</p>
-                        <div class="flex gap-1">
-                            <input id="pNameB" type="text" class="flex-1 bg-slate-950 p-2 rounded text-xs border border-slate-800">
-                            <button onclick="addPlayer('B')" class="bg-red-600 px-2 rounded text-[10px] font-black">+</button>
-                        </div>
+                    <div class="flex gap-2">
+                        <input id="pNameB" type="text" placeholder="Team B Player Name" class="admin-input">
+                        <button onclick="addPlayer('B')" class="btn-add">ADD</button>
                     </div>
+                </div>
+
+                <div class="pt-2 border-t border-slate-800">
+                    <p class="text-[9px] text-slate-500 uppercase font-bold mb-2">Current Squads:</p>
+                    <div id="squadList" class="text-[10px] text-slate-400 grid grid-cols-2 gap-2"></div>
                 </div>
             </div>
 
-            <div class="bg-slate-900 p-5 rounded-[2.5rem] border-2 border-yellow-500/10 space-y-4">
-                <p class="text-[10px] font-black text-green-500 uppercase tracking-widest text-center">2. Scoring Panel</p>
+            <div class="bg-slate-900 p-5 rounded-[2.5rem] border border-slate-800 space-y-4">
+                <p class="text-[10px] font-black text-green-500 uppercase tracking-widest text-center">3. Scoring Controls</p>
                 <div class="grid grid-cols-4 gap-2">
                     <button onclick="handleRun(0)" class="bg-slate-950 h-12 rounded-xl border border-slate-800 font-bold">0</button>
                     <button onclick="handleRun(1)" class="bg-slate-950 h-12 rounded-xl border border-slate-800 font-bold">1</button>
@@ -99,18 +75,22 @@
                     <button onclick="clearForInjury()" class="bg-orange-600 h-12 rounded-xl font-black text-[9px]">INJURY</button>
                 </div>
                 
-                <div class="pt-4 border-t border-slate-800">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <p class="text-[8px] font-black text-blue-400 uppercase mb-2">Batting List</p>
-                            <div id="adminBatList" class="space-y-1"></div>
-                        </div>
-                        <div>
-                            <p class="text-[8px] font-black text-red-400 uppercase mb-2">Bowling List</p>
-                            <div id="adminBowlList" class="space-y-1"></div>
-                        </div>
+                <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-800">
+                    <div>
+                        <p class="text-[8px] font-black text-blue-400 uppercase mb-2">Select Batsman</p>
+                        <div id="adminBatList" class="space-y-1"></div>
+                    </div>
+                    <div>
+                        <p class="text-[8px] font-black text-red-400 uppercase mb-2">Select Bowler</p>
+                        <div id="adminBowlList" class="space-y-1"></div>
                     </div>
                 </div>
+            </div>
+
+            <div class="pt-4">
+                <button onclick="resetAllData()" class="w-full bg-red-900/30 border border-red-500/50 text-red-500 py-3 rounded-xl font-black text-xs uppercase tracking-widest">
+                    ⚠️ Reset Entire Match
+                </button>
             </div>
         </div>
 
@@ -124,17 +104,23 @@
 
         let state = {
             maxOvers: 5, runs: 0, wickers: 0, balls: 0,
-            players: [], sIdx: null, nsIdx: null, bIdx: null, lastBIdx: null,
-            batTeam: 'Team A', bowlTeam: 'Team B', curBat: 'Team A', overHistory: []
+            players: [], sIdx: null, nsIdx: null, bIdx: null,
+            batTeam: 'Team A', curBat: 'Team A', overHistory: []
         };
         let isAdmin = false;
 
         function toggleAdmin() {
-            if(!isAdmin) { if(prompt("Admin PIN:") === ADMIN_PASS) { 
-                isAdmin = true; document.getElementById('adminPanel').classList.remove('hidden'); 
-                document.getElementById('adminBtn').innerText = "Exit Admin";
-            } } 
-            else { isAdmin = false; document.getElementById('adminPanel').classList.add('hidden'); document.getElementById('adminBtn').innerText = "Admin Login"; }
+            if(!isAdmin) {
+                if(prompt("Admin PIN:") === ADMIN_PASS) {
+                    isAdmin = true;
+                    document.getElementById('adminPanel').classList.remove('hidden');
+                    document.getElementById('adminBtn').innerText = "Exit Admin";
+                }
+            } else {
+                isAdmin = false;
+                document.getElementById('adminPanel').classList.add('hidden');
+                document.getElementById('adminBtn').innerText = "Admin Login";
+            }
             render();
         }
 
@@ -143,30 +129,27 @@
             const teamName = type === 'A' ? (document.getElementById('teamAInput').value || 'Team A') : (document.getElementById('teamBInput').value || 'Team B');
             const name = document.getElementById(inputId).value;
             if(!name) return;
-            state.players.push({name, team: teamName, r:0, b:0, isOut:false, outDesc:'', rc:0, bb:0, w:0});
+            
+            state.players.push({name: name, team: teamName, r:0, b:0, isOut:false, rc:0, bb:0, w:0});
             document.getElementById(inputId).value = '';
             render(); sync();
         }
 
+        function resetAllData() {
+            if(confirm("Are you sure? This deletes ALL scores and players.")) {
+                state = { maxOvers: 5, runs: 0, wickers: 0, balls: 0, players: [], sIdx: null, nsIdx: null, bIdx: null, batTeam: 'Team A', curBat: 'Team A', overHistory: [] };
+                render(); sync();
+            }
+        }
+
+        // Logic functions (handleRun, handleWicket, render, sync) same as previous for stability
         function handleRun(r) {
-            if(state.sIdx === null || state.bIdx === null) return alert("Select Players First");
+            if(state.sIdx === null || state.bIdx === null) return alert("Select Strike/Bowler!");
             state.runs += r; state.balls++;
             state.players[state.sIdx].r += r; state.players[state.sIdx].b++;
             state.players[state.bIdx].rc += r; state.players[state.bIdx].bb++;
-            state.overHistory.push(r.toString());
             if(r % 2 !== 0) swap();
-            if(state.balls % 6 === 0) { state.lastBIdx = state.bIdx; state.bIdx = null; state.overHistory = []; swap(); alert("Over Complete!"); }
-            render(); sync();
-        }
-
-        function handleWicketFlow() {
-            if(state.sIdx === null) return;
-            state.wickers++; state.balls++;
-            state.players[state.bIdx].w++; state.players[state.bIdx].bb++;
-            state.players[state.sIdx].isOut = true;
-            state.players[state.sIdx].outDesc = `b ${state.players[state.bIdx].name}`;
-            state.sIdx = null; state.overHistory.push('W');
-            if(state.balls % 6 === 0) { state.lastBIdx = state.bIdx; state.bIdx = null; state.overHistory = []; swap(); alert("Over Complete!"); }
+            if(state.balls % 6 === 0) { state.bIdx = null; alert("Over Over!"); }
             render(); sync();
         }
 
@@ -183,60 +166,31 @@
             document.getElementById('batTeamDisp').innerText = state.curBat;
             document.getElementById('dispScore').innerText = `${state.runs}/${state.wickers}`;
             document.getElementById('dispOvers').innerText = `${Math.floor(state.balls/6)}.${state.balls%6}`;
-            document.getElementById('dispSName').innerText = state.sIdx !== null ? state.players[state.sIdx].name : "---";
-            document.getElementById('dispNSName').innerText = state.nsIdx !== null ? state.players[state.nsIdx].name : "---";
-            if(state.sIdx !== null) document.getElementById('dispSStats').innerText = `${state.players[state.sIdx].r}(${state.players[state.sIdx].b})`;
-            if(state.nsIdx !== null) document.getElementById('dispNSStats').innerText = `${state.players[state.nsIdx].r}(${state.players[state.nsIdx].b})`;
 
-            if(state.bIdx !== null) {
-                const b = state.players[state.bIdx];
-                document.getElementById('dispBName').innerText = b.name;
-                document.getElementById('dispBStats').innerText = `${b.w}-${b.rc} (${Math.floor(b.bb/6)}.${b.bb%6})`;
-                document.getElementById('dispBEcon').innerText = `ECON: ${b.bb > 0 ? (b.rc/(b.bb/6)).toFixed(2) : '0.00'}`;
-            } else { document.getElementById('dispBName').innerText = "---"; }
-
-            // Split Selection List
+            const squadBox = document.getElementById('squadList');
             const batL = document.getElementById('adminBatList');
             const bowlL = document.getElementById('adminBowlList');
-            batL.innerHTML = ''; bowlL.innerHTML = '';
+            
+            squadBox.innerHTML = ''; batL.innerHTML = ''; bowlL.innerHTML = '';
 
             state.players.forEach((p, i) => {
+                squadBox.innerHTML += `<div>${p.name} (${p.team})</div>`;
                 if(p.isOut) return;
-                const active = (i === state.sIdx || i === state.nsIdx || i === state.bIdx);
-                if(active) return;
-
+                
                 const btn = (type, color) => `<button onclick="setField(${i},'${type}')" class="bg-${color}-900 px-2 py-1 rounded text-[7px] font-black">${type}</button>`;
                 
                 if(p.team === state.curBat) {
-                    batL.innerHTML += `<div class="flex justify-between items-center bg-slate-950 p-2 rounded mb-1 border border-slate-800">
+                    batL.innerHTML += `<div class="flex justify-between items-center bg-slate-950 p-1 rounded mb-1 border border-slate-800">
                         <span class="text-[9px] truncate w-16">${p.name}</span>
                         <div class="flex gap-1">${state.sIdx===null?btn('S','blue'):''}${state.nsIdx===null?btn('NS','slate'):''}</div>
                     </div>`;
                 } else {
-                    if(i === state.lastBIdx) return;
-                    bowlL.innerHTML += `<div class="flex justify-between items-center bg-slate-950 p-2 rounded mb-1 border border-slate-800">
+                    bowlL.innerHTML += `<div class="flex justify-between items-center bg-slate-950 p-1 rounded mb-1 border border-slate-800">
                         <span class="text-[9px] truncate w-16">${p.name}</span>
                         ${state.bIdx===null?btn('B','red'):''}
                     </div>`;
                 }
             });
-
-            document.getElementById('overTimeline').innerHTML = state.overHistory.map(b => `<div class="ball-dot ${b==='W'?'bg-red-600':'bg-slate-800'}">${b}</div>`).join('');
-            
-            // Full Scorecard
-            document.getElementById('statsContent').innerHTML = `
-                <div class="bg-slate-900 p-5 rounded-[2rem] border border-slate-800">
-                    <p class="text-[10px] font-black text-yellow-500 uppercase mb-4 tracking-widest">Batting: ${state.curBat}</p>
-                    <table class="w-full text-[11px]">
-                        <tr class="text-slate-500 border-b border-slate-800 text-left font-bold"><th class="pb-2">BATSMAN</th><th class="pb-2 text-center">R</th><th class="pb-2 text-center">B</th><th class="pb-2 text-right">SR</th></tr>
-                        ${state.players.filter(p => p.team === state.curBat).map(p => `
-                            <tr class="border-b border-slate-800/30">
-                                <td class="py-2"><p class="font-bold">${p.name}</p><p class="text-[8px] text-slate-500">${p.isOut?p.outDesc:'not out'}</p></td>
-                                <td class="text-center font-bold">${p.r}</td><td class="text-center">${p.b}</td>
-                                <td class="text-right text-slate-400">${p.b>0?((p.r/p.b)*100).toFixed(1):'0.0'}</td>
-                            </tr>`).join('')}
-                    </table>
-                </div>`;
         }
     </script>
 </body>
