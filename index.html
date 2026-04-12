@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sunday League Pro</title>
+    <title>Sunday Live Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -12,6 +12,18 @@
     </style>
 </head>
 <body class="bg-[#0b0f1a] text-slate-100 min-h-screen pb-24 font-sans">
+
+    <div id="setupScreen" class="fixed inset-0 z-[100] bg-slate-950 p-6 flex flex-col justify-center items-center">
+        <div class="w-full max-w-sm space-y-6">
+            <h1 class="text-3xl font-black italic text-yellow-500 text-center uppercase tracking-tighter">Match Setup</h1>
+            <div class="space-y-4">
+                <input id="teamAInput" type="text" placeholder="Batting Team Name" class="w-full bg-slate-900 border border-slate-800 p-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                <input id="teamBInput" type="text" placeholder="Bowling Team Name" class="w-full bg-slate-900 border border-slate-800 p-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                <input id="oversInput" type="number" placeholder="Total Overs" class="w-full bg-slate-900 border border-slate-800 p-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                <button onclick="startMatch()" class="w-full bg-yellow-500 text-black font-black py-4 rounded-2xl uppercase tracking-widest shadow-lg shadow-yellow-500/20">Create Match</button>
+            </div>
+        </div>
+    </div>
 
     <nav class="p-4 flex justify-between items-center bg-slate-900/90 backdrop-blur-md sticky top-0 z-50 border-b border-slate-800">
         <h1 class="font-black italic text-yellow-500 tracking-tighter text-xl uppercase">Sunday Live</h1>
@@ -57,7 +69,7 @@
             </div>
             <div class="text-right">
                 <p id="dispBStats" class="text-xl font-black">0-0 (0.0)</p>
-                <p id="dispBEcon" class="text-[9px] font-bold text-slate-500">ECON: 0.00</p>
+                <p id="dispBEcon" class="text-[9px] font-bold text-slate-500 uppercase">Econ: 0.00</p>
             </div>
         </div>
 
@@ -84,7 +96,7 @@
             </div>
 
             <div class="pt-4 border-t border-slate-800">
-                <p class="text-[10px] font-black text-slate-500 uppercase mb-3 tracking-widest">Select Players</p>
+                <p class="text-[10px] font-black text-slate-500 uppercase mb-3 tracking-widest">Squad Selection</p>
                 <div id="adminPList" class="space-y-1 max-h-48 overflow-y-auto no-scrollbar"></div>
             </div>
         </div>
@@ -105,6 +117,22 @@
         };
         let isAdmin = false;
 
+        function startMatch() {
+            const tA = document.getElementById('teamAInput').value || 'Team A';
+            const tB = document.getElementById('teamBInput').value || 'Team B';
+            const ov = parseInt(document.getElementById('oversInput').value) || 5;
+
+            state.batTeam = tA; state.bowlTeam = tB; state.curBat = tA; state.maxOvers = ov;
+            
+            // Create placeholders for squads
+            state.players = [];
+            for(let i=1; i<=11; i++) state.players.push({name: `${tA} ${i}`, team: tA, r:0, b:0, isOut:false, outDesc:'', rc:0, bb:0, w:0});
+            for(let i=1; i<=11; i++) state.players.push({name: `${tB} ${i}`, team: tB, r:0, b:0, isOut:false, outDesc:'', rc:0, bb:0, w:0});
+            
+            document.getElementById('setupScreen').classList.add('hidden');
+            render(); sync();
+        }
+
         function handleRun(r) {
             if(!checkReady()) return;
             state.runs += r; state.balls++;
@@ -115,12 +143,12 @@
         }
 
         function handleExtra(type) {
-            let runs = parseInt(prompt(`${type} + runs taken?`, "0")) || 0;
-            state.runs += (1 + runs);
-            state.players[state.bIdx].rc += (1 + runs);
-            if(type === 'NB') { state.players[state.sIdx].r += runs; state.players[state.sIdx].b++; }
-            state.overHistory.push(`${type}${runs > 0 ? '+'+runs : ''}`);
-            if(runs % 2 !== 0) swap();
+            let r = parseInt(prompt(`${type} + runs?`, "0")) || 0;
+            state.runs += (1 + r);
+            state.players[state.bIdx].rc += (1 + r);
+            if(type === 'NB') { state.players[state.sIdx].r += r; state.players[state.sIdx].b++; }
+            state.overHistory.push(`${type}${r > 0 ? '+'+r : ''}`);
+            if(r % 2 !== 0) swap();
             render(); sync();
         }
 
@@ -141,17 +169,24 @@
                 state.bIdx = null;
                 state.overHistory = [];
                 swap();
-                alert("Over complete. Select a NEW bowler.");
+                alert("Over Finished! Same bowler cannot bowl twice in a row.");
             }
             render(); sync();
         }
 
         function checkReady() {
             if(state.sIdx === null || state.nsIdx === null || state.bIdx === null) {
-                alert("Select Striker, Non-Striker and Bowler first.");
+                alert("Please select Striker, Non-Striker, and Bowler.");
                 return false;
             }
             return true;
+        }
+
+        function setField(i, type) { 
+            if(type==='S') state.sIdx = i; 
+            if(type==='NS') state.nsIdx = i; 
+            if(type==='B') state.bIdx = i; 
+            render(); sync(); 
         }
 
         function renderAdminList() {
@@ -203,35 +238,22 @@
             }).join('');
         }
 
-        function setField(i, type) { 
-            if(type==='S') state.sIdx = i; 
-            if(type==='NS') state.nsIdx = i; 
-            if(type==='B') state.bIdx = i; 
-            render(); sync(); 
-        }
-
-        function clearForInjury() {
-            if(confirm("Change a live player due to injury?")) {
-                state.sIdx = null; state.nsIdx = null; render();
-            }
-        }
-
-        function toggleAdmin() {
-            if(!isAdmin) { if(prompt("PIN:") === ADMIN_PASS) { isAdmin = true; document.getElementById('scorerPanel').classList.remove('hidden'); } }
-            else { document.getElementById('scorerPanel').classList.toggle('hidden'); }
-            render();
-        }
-
+        function clearForInjury() { if(confirm("Replace live players for injury?")) { state.sIdx = null; state.nsIdx = null; render(); } }
+        function toggleAdmin() { if(!isAdmin) { if(prompt("PIN:") === ADMIN_PASS) { isAdmin = true; document.getElementById('scorerPanel').classList.remove('hidden'); } } else { document.getElementById('scorerPanel').classList.toggle('hidden'); } render(); }
         function swap() { let t = state.sIdx; state.sIdx = state.nsIdx; state.nsIdx = t; }
         function openExtraMenu() { document.getElementById('extraMenu').classList.toggle('hidden'); }
-        async function sync() { if(isAdmin) await fetch(API_URL, {method:'POST', body:JSON.stringify(state), headers:{'Content-Type':'application/json'}}); }
+        async function sync() { if(isAdmin && state.players.length > 0) await fetch(API_URL, {method:'POST', body:JSON.stringify(state), headers:{'Content-Type':'application/json'}}); }
 
         function render() {
+            document.getElementById('batTeamDisp').innerText = state.curBat;
+            document.getElementById('limitOvers').innerText = state.maxOvers;
             document.getElementById('dispScore').innerText = `${state.runs}/${state.wickers}`;
             document.getElementById('dispOvers').innerText = `${Math.floor(state.balls/6)}.${state.balls%6}`;
+            
             document.getElementById('cardS').classList.toggle('striker-glow', state.sIdx !== null);
             document.getElementById('dispSName').innerText = state.sIdx !== null ? state.players[state.sIdx].name : "---";
             document.getElementById('dispNSName').innerText = state.nsIdx !== null ? state.players[state.nsIdx].name : "---";
+            
             if(state.sIdx !== null) document.getElementById('dispSStats').innerText = `${state.players[state.sIdx].r}(${state.players[state.sIdx].b})`;
             if(state.nsIdx !== null) document.getElementById('dispNSStats').innerText = `${state.players[state.nsIdx].r}(${state.players[state.nsIdx].b})`;
             
@@ -240,7 +262,7 @@
                 document.getElementById('dispBName').innerText = b.name;
                 document.getElementById('dispBStats').innerText = `${b.w}-${b.rc} (${Math.floor(b.bb/6)}.${b.bb%6})`;
                 document.getElementById('dispBEcon').innerText = `ECON: ${b.bb > 0 ? (b.rc/(b.bb/6)).toFixed(2) : '0.00'}`;
-            }
+            } else { document.getElementById('dispBName').innerText = "---"; document.getElementById('dispBStats').innerText = "0-0 (0.0)"; }
 
             document.getElementById('overTimeline').innerHTML = state.overHistory.map(b => `<div class="ball-dot ${b.includes('W') ? 'bg-red-600' : 'bg-slate-800'}">${b}</div>`).join('');
             renderAdminList(); renderStats();
