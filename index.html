@@ -2027,27 +2027,31 @@
     // SET PLAYER ROLE
     // =========================
 
-    function setField(index, role) {
+   function setField(index, role) {
 
-        if(role === 'S') {
+    if(role === 'S') {
 
-            state.sIdx = index;
-        }
-
-        else if(role === 'NS') {
-
-            state.nsIdx = index;
-        }
-
-        else if(role === 'B') {
-
-            state.bIdx = index;
-        }
-
-        render();
-
-        syncToCloud();
+        state.sIdx = index;
     }
+
+    else if(role === 'NS') {
+
+        state.nsIdx = index;
+    }
+
+    else if(role === 'B') {
+
+        state.bIdx = index;
+
+        // ✅ OVER COMPLETE FIX
+
+        state.isOverWaiting = false;
+    }
+
+    render();
+
+    syncToCloud();
+}
 
 
     // =========================
