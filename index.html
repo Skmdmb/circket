@@ -809,17 +809,6 @@
 
         <!-- WIDE -->
 
-<button onclick="handleWide()"
-    class="
-        bg-pink-600
-        h-12
-        rounded-xl
-        text-[10px]
-        font-black
-    ">
-    WD
-</button>
-
 <!-- NO BALL -->
 
 <button onclick="handleNoBallPrompt()"
@@ -1656,27 +1645,11 @@
         syncToCloud();
     }
 
+// =========================
+// NO BALL
+// =========================
 
-    // =========================
-    // NO BALL
-    // =========================
-
-    fnctioun handleNoBall(r) {
-
-        if(
-            state.sIdx === null ||
-            state.bIdx === null
-        ) return;
-
-        saveUndo();
-
-        // 1 EXTRA + RUN
-
-        state.runs += (1 + r);
-
-        // BATTER RUN
-
-        state.players[statfunction handleNoBallPrompt() {
+function handleNoBallPrompt() {
 
     if(
         state.sIdx === null ||
@@ -1686,20 +1659,19 @@
     let extraRuns = parseInt(
 
         prompt(
-            "Extra runs scored?\n\nExample:\n0\n1\n2\n3\n4\n6"
+            "Extra runs scored?\n\n0\n1\n2\n3\n4\n6"
         )
-
     );
 
     if(isNaN(extraRuns)) return;
 
     saveUndo();
 
-    // SCORE
+    // TOTAL SCORE
 
     state.runs += (1 + extraRuns);
 
-    // BATTER RUNS
+    // BATSMAN RUNS
 
     state.players[state.sIdx].r += extraRuns;
 
@@ -1711,11 +1683,17 @@
 
     state.overBalls.push(`NB+${extraRuns}`);
 
+    // STRIKE CHANGE
+
+    if(extraRuns % 2 !== 0) {
+
+        swap();
+    }
+
     render();
 
     syncToCloud();
 }
-
     // =========================
     // RUN OUT
     // =========================
